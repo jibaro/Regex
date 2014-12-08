@@ -190,4 +190,50 @@ public class RegexCheckerTest {
 		assertTrue(RegexChecker.findMatched("[abc]{3}", "acbabbca"));
 		assertFalse(RegexChecker.findMatched("[abc]{3}", "acdaae"));
 	}
+	
+	
+	/*     Backreference     */
+	
+	
+	// A backreference is specified in the regular expression as a backslash (\) 
+	// followed by a digit indicating the number of the group to be recalled(repeated).
+	@Test
+	public void testBackreference() {
+		//  \1  means repeat the before (\d\d) again,  1212 works, but 1213 not
+		assertTrue(RegexChecker.findMatched("(\\d\\d)\\1", "1212"));
+		assertFalse(RegexChecker.findMatched("(\\d\\d)\\1", "1213"));
+	}
+	
+	
+	
+	/*    Boundary     */
+	
+	/*
+	 * Boundary Construct	Description
+			^				The beginning of a line
+			$				The end of a line
+			\b				A word boundary
+			\B				A non-word boundary
+			\A				The beginning of the input
+			\G				The end of the previous match
+			\Z				The end of the input but for the final terminator, if any
+			\z				The end of the input
+	 */
+	@Test
+	public void testBoundary() {
+		assertTrue(RegexChecker.findMatched("^dog$", "dog"));
+		assertFalse(RegexChecker.findMatched("^dog$", "   dog"));
+		assertFalse(RegexChecker.findMatched("^dog$", "dog   "));
+		
+		assertTrue(RegexChecker.findMatched("\\s*dog$", "    dog"));   // white space
+		assertTrue(RegexChecker.findMatched("^dog\\w*", "dogabcdef"));   // word
+		
+		// \b check whether it's a separate word, which means whether there is white space there
+		assertTrue(RegexChecker.findMatched("\\bdog\\b", "This is a dog playing the ball"));
+		assertFalse(RegexChecker.findMatched("\\bdog\\b", "This hotdog is delicious"));
+		assertTrue(RegexChecker.findMatched("\\Bdog\\b", "This hotdog is delicious"));
+		
+		assertEquals(RegexChecker.getMatchedResult("dog", "dog dog").size(), 2);
+		assertEquals(RegexChecker.getMatchedResult("\\Gdog", "dog dog").size(), 1);   // the second dog doesn't start at the end of the first match
+	}
 }
